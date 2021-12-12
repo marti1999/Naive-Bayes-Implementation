@@ -2,6 +2,8 @@ import os
 import re
 import string
 import math
+
+import numpy as np
 import pandas
 
 
@@ -17,10 +19,10 @@ def get_data():
 class naiveBayes():
     def __init__(self):
 
-        self.tweet_num = {}
-        self.log_class_priors = {}
-        self.wc = {}
-        self.vocab = set()
+        self.tweet_num = {} # stores the amount of tweets that are 'positive' or 'negative'
+        self.log_class_priors = {} # stores the prior probability of a message being 'positive' or 'negative'
+        self.wc = {} # for each class, stores the amount of times a word appears
+        self.vocab = set() # set of unique words.
 
     def item_count(self, text):
         wc = {}
@@ -33,30 +35,45 @@ class naiveBayes():
 
     def fit(self, X, y):
 
-
+        # dataframe to npArray
         xArr = X.values
         yArr = y.values
 
+        # total amount of tweets
         n = X.shape[0]
-        self.tweet_num['negative'] = sum(1 for c in yArr if c == 0)
-        self.tweet_num['positive'] = sum(1 for c in yArr if c == 1)
+
+        # storing the amount of tweets that are 'positive' or 'negative'
+        self.tweet_num['positive'] = np.count_nonzero(yArr)
+        self.tweet_num['negative'] = n - self.tweet_num['positive']
+
+        # calculating the prior probability of a message being 'positive' or 'negative'
         self.log_class_priors['negative'] = math.log(self.tweet_num['negative'])
         self.log_class_priors['positive'] = math.log(self.tweet_num['positive'])
+
         self.wc['negative'] = {}
         self.wc['positive'] = {}
 
+        # iterating through all tweets
         for x, y in zip(xArr, yArr):
 
             c = 'negative'
             if y == 1:
                 c = 'positive'
 
+            # splitting tweet into dictionary word:count
             counts = self.item_count(self.split(x))
+
+            # for each unique word in the tweet
             for word, count in counts.items():
+
+                # creating new items should they not exist
                 if word not in self.vocab:
                     self.vocab.add(word)
                 if  word not in self.wc[c]:
                     self.wc[c][word] = 0.0
+
+                # increasing the count for wrod in class
+                self.wc[c][word] += count
 
 
         return n
