@@ -9,19 +9,28 @@ import pandas
 import sklearn
 
 
-def get_data():
+def get_data(n_rows=None):
     # data = pandas.read_csv('top10k.csv', sep=';')
     data = pandas.read_csv('FinalStemmedSentimentAnalysisDataset.csv', sep=';')
+    data = data.sample(random_state=0, frac=1).reset_index(drop=True)
+
+    if n_rows is not None and n_rows > 0:
+        data = data.sample(n=min(n_rows, data.shape[0])).reset_index(drop=True)
+
     X = data['tweetText']
     y = data['sentimentLabel']
     # return X.values, y.values
     # return X.tolist(), y.tolist()
     return X, y
 
-
+# Inherit from sklearn.base.BaseEstimator
+# https://scikit-learn.org/stable/developers/develop.html
+# Needed in order to use some sklearn modules like cross_validate
+#   "All estimators in the main scikit-learn codebase should inherit from sklearn.base.BaseEstimator."
 class naiveBayes(sklearn.base.BaseEstimator):
-    def __init__(self):
+    def __init__(self, laplace_smoothing=1):
 
+        self.laplace_smoothing=laplace_smoothing
         self.tweet_num = {}  # stores the amount of tweets that are 'positive' or 'negative'
         self.log_prior_probability = {}  # stores the log prior probability of a message being 'positive' or 'negative'
         self.wc = {}  # for each class, stores the amount of times a word appears
@@ -96,9 +105,9 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 # all words in the tweets of the class.
                 # Since we can't calculate log of 0, we use Laplace Smoothing, adding 1 to the numerator.
                 # In order to balance it, the size of the dictionary must be added to the numerator
-                log_positive = math.log((self.wc['positive'].get(word, 0.0) + 1)
+                log_positive = math.log((self.wc['positive'].get(word, 0.0) + self.laplace_smoothing)
                                         / (self.tweet_num['positive'] + len(self.dictionary)))
-                log_negative = math.log((self.wc['negative'].get(word, 0.0) + 1)
+                log_negative = math.log((self.wc['negative'].get(word, 0.0) + self.laplace_smoothing)
                                         / (self.tweet_num['negative'] + len(self.dictionary)))
 
                 positive_count += log_positive
@@ -117,20 +126,21 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
 
 def main():
-    X, y = get_data()
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    # nb = naiveBayes()
-    # nb.fit(X_train, y_train)
-    # y_pred = nb.predict(X_test)
-    # print(classification_report(y_test, y_pred))
+    X, y = get_data(n_rows=10000)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    nb = naiveBayes()
+    nb.fit(X_train, y_train)
+    y_pred = nb.predict(X_test)
+    print(classification_report(y_test, y_pred))
 
 
-    kf = KFold(n_splits=5, random_state=None, shuffle=True)
-    NB = naiveBayes()
-    metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
-    cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
-    print(cv_results)
+    # kf = KFold(n_splits=5, random_state=None, shuffle=True)
+    # NB = naiveBayes()
+    # metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
+    # cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
+    # print(cv_results)
 
 
 
