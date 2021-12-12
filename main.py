@@ -2,14 +2,15 @@ import os
 import re
 import string
 import math
-
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 import numpy as np
 import pandas
 
 
 def get_data():
-    data = pandas.read_csv('top10k.csv', sep=';')
-    # data = pandas.read_csv('FinalStemmedSentimentAnalysisDataset.csv', sep=';')
+    # data = pandas.read_csv('top10k.csv', sep=';')
+    data = pandas.read_csv('FinalStemmedSentimentAnalysisDataset.csv', sep=';')
     X = data['tweetText']
     y = data['sentimentLabel']
     # return X.values, y.values
@@ -32,7 +33,7 @@ class naiveBayes():
         return wc
 
     def split(self, text):
-        return re.split("\W+", text)
+        return re.split("\W+", str(text))
 
     def fit(self, X, y):
 
@@ -77,7 +78,7 @@ class naiveBayes():
                 self.wc[c][word] += count
 
     def predict(self, X):
-        xArr = X.values()
+        xArr = X.values
         result = []
 
         for tweet in xArr:
@@ -116,9 +117,13 @@ class naiveBayes():
 
 def main():
     X, y = get_data()
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     nb = naiveBayes()
-    nb.fit(X, y)
-    print("hola")
+    nb.fit(X_train, y_train)
+    y_pred = nb.predict(X_test)
+    print(classification_report(y_test, y_pred))
+
 
 
 if __name__ == "__main__":
