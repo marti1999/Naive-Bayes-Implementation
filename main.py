@@ -2,10 +2,11 @@ import os
 import re
 import string
 import math
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold, cross_validate
 from sklearn.metrics import classification_report
 import numpy as np
 import pandas
+import sklearn
 
 
 def get_data():
@@ -18,7 +19,7 @@ def get_data():
     return X, y
 
 
-class naiveBayes():
+class naiveBayes(sklearn.base.BaseEstimator):
     def __init__(self):
 
         self.tweet_num = {}  # stores the amount of tweets that are 'positive' or 'negative'
@@ -118,11 +119,19 @@ class naiveBayes():
 def main():
     X, y = get_data()
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    nb = naiveBayes()
-    nb.fit(X_train, y_train)
-    y_pred = nb.predict(X_test)
-    print(classification_report(y_test, y_pred))
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # nb = naiveBayes()
+    # nb.fit(X_train, y_train)
+    # y_pred = nb.predict(X_test)
+    # print(classification_report(y_test, y_pred))
+
+
+    kf = KFold(n_splits=5, random_state=None, shuffle=True)
+    NB = naiveBayes()
+    metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
+    cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
+    print(cv_results)
+
 
 
 
