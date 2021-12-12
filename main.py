@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report
 import numpy as np
 import pandas
 import sklearn
+import argparse
 
 
 def get_data(n_rows=None):
@@ -23,14 +24,16 @@ def get_data(n_rows=None):
     # return X.tolist(), y.tolist()
     return X, y
 
+
 # Inherit from sklearn.base.BaseEstimator
 # https://scikit-learn.org/stable/developers/develop.html
 # Needed in order to use some sklearn modules like cross_validate
 #   "All estimators in the main scikit-learn codebase should inherit from sklearn.base.BaseEstimator."
 class naiveBayes(sklearn.base.BaseEstimator):
     def __init__(self, laplace_smoothing=1):
-
-        self.laplace_smoothing=laplace_smoothing
+        if laplace_smoothing is None:
+            laplace_smoothing = 1
+        self.laplace_smoothing = laplace_smoothing
         self.tweet_num = {}  # stores the amount of tweets that are 'positive' or 'negative'
         self.log_prior_probability = {}  # stores the log prior probability of a message being 'positive' or 'negative'
         self.wc = {}  # for each class, stores the amount of times a word appears
@@ -126,23 +129,37 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
 
 def main():
+    args = parse_arguments()
 
-    X, y = get_data(n_rows=10000)
+    X, y = get_data(n_rows=args.n_rows)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    nb = naiveBayes()
-    nb.fit(X_train, y_train)
-    y_pred = nb.predict(X_test)
-    print(classification_report(y_test, y_pred))
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # nb = naiveBayes(laplace_smoothing=args.smooth)
+    # nb.fit(X_train, y_train)
+    # y_pred = nb.predict(X_test)
+    # print(classification_report(y_test, y_pred))
+
+    kf = KFold(n_splits=args.n_splits, random_state=None, shuffle=True)
+    NB = naiveBayes(laplace_smoothing=args.smooth)
+    metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
+    cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
+    for metric in list(metrics):
+        print(metric, cv_results['test_'+str(metric)].mean())
 
 
-    # kf = KFold(n_splits=5, random_state=None, shuffle=True)
-    # NB = naiveBayes()
-    # metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
-    # cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
-    # print(cv_results)
-
-
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Naïve Bayes')
+    parser.add_argument('--smooth', type=float, default=1, help='Value for Laplace Smoothing')
+    parser.add_argument('--n_rows', type=int, default=None, help='Amount of rows to read from csv file')
+    parser.add_argument('--n_splits', type=int, default=5, help='K_Fold splits')
+    args = parser.parse_args()
+    if args.smooth is not None and args.smooth < 0:
+        parser.error("smooth argument cannot be less than 0")
+    if args.n_rows is not None and args.n_rows < 1:
+        parser.error("n_rows cannot be less than 1")
+    if args.n_splits is not None and (args.n_splits < 1 or args.n_splits > 50):
+        parser.error("n_splits must be between 1 and 50")
+    return args
 
 
 if __name__ == "__main__":
