@@ -1,6 +1,4 @@
-import os
 import re
-import string
 import math
 from sklearn.model_selection import train_test_split, KFold, cross_validate
 from sklearn.metrics import classification_report
@@ -76,6 +74,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 c = 'positive'
 
             # splitting tweet into dictionary word:count
+            # TODO: intentar utilitzar la llibreria Counter
             counts = self.item_count(self.split(x))
 
             # for each unique word in the tweet
@@ -148,7 +147,7 @@ def main():
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Naïve Bayes')
+    parser = argparse.ArgumentParser()
     parser.add_argument('--smooth', type=float, default=1, help='Value for Laplace Smoothing')
     parser.add_argument('--n_rows', type=int, default=None, help='Amount of rows to read from csv file')
     parser.add_argument('--n_splits', type=int, default=5, help='K_Fold splits')
