@@ -6,6 +6,9 @@ import numpy as np
 import pandas
 import sklearn
 import argparse
+from collections import Counter
+# from line_profiler_pycharm import profile
+
 
 
 def get_data(n_rows=None):
@@ -37,15 +40,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
         self.wc = {}  # for each class, stores the amount of times a word appears
         self.dictionary = set()  # set of unique words.
 
-    def item_count(self, text):
-        wc = {}
-        for w in text:
-            wc[w] = wc.get(w, 0.0) + 1.0
-        return wc
-
-    def split(self, text):
-        return re.split("\W+", str(text))
-
+    # @profile
     def fit(self, X, y):
 
         # dataframe to npArray
@@ -74,8 +69,8 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 c = 'positive'
 
             # splitting tweet into dictionary word:count
-            # TODO: intentar utilitzar la llibreria Counter
-            counts = self.item_count(self.split(x))
+            xsplit = str(x).split()
+            counts = Counter(xsplit)
 
             # for each unique word in the tweet
             for word, count in counts.items():
@@ -89,12 +84,15 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 # increasing the count for word in class
                 self.wc[c][word] += count
 
+    # @profile
     def predict(self, X):
         xArr = X.values
         result = []
 
         for tweet in xArr:
-            word_counts = self.item_count(self.split(tweet))
+
+            xsplit = str(tweet).split()
+            word_counts = Counter(xsplit)
             positive_count = 0
             negative_count = 0
             for word, _ in word_counts.items():
@@ -126,24 +124,25 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
         return result
 
-
+# @profile
 def main():
     args = parse_arguments()
 
     X, y = get_data(n_rows=args.n_rows)
+    # X, y = get_data(n_rows=10000)
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    # nb = naiveBayes(laplace_smoothing=args.smooth)
-    # nb.fit(X_train, y_train)
-    # y_pred = nb.predict(X_test)
-    # print(classification_report(y_test, y_pred))
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    nb = naiveBayes(laplace_smoothing=args.smooth)
+    nb.fit(X_train, y_train)
+    y_pred = nb.predict(X_test)
+    print(classification_report(y_test, y_pred))
 
-    kf = KFold(n_splits=args.n_splits, random_state=None, shuffle=True)
-    NB = naiveBayes(laplace_smoothing=args.smooth)
-    metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
-    cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
-    for metric in list(metrics):
-        print(metric, cv_results['test_'+str(metric)].mean())
+    # kf = KFold(n_splits=args.n_splits, random_state=None, shuffle=True)
+    # NB = naiveBayes(laplace_smoothing=args.smooth)
+    # metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
+    # cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
+    # for metric in list(metrics):
+    #     print(metric, cv_results['test_'+str(metric)].mean())
 
 
 def parse_arguments():
