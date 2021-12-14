@@ -1,5 +1,7 @@
 import re
 import math
+import time
+
 from sklearn.model_selection import train_test_split, KFold, cross_validate
 from sklearn.metrics import classification_report
 import numpy as np
@@ -11,9 +13,9 @@ from collections import Counter
 
 
 
-def get_data(n_rows=None):
+def read_data(n_rows=None):
     # data = pandas.read_csv('top10k.csv', sep=';')
-    data = pandas.read_csv('FinalStemmedSentimentAnalysisDataset.csv', sep=';')
+    data = pandas.read_csv('data.csv', sep=';')
     data = data.sample(random_state=0, frac=1).reset_index(drop=True)
 
     if n_rows is not None and n_rows > 0:
@@ -32,8 +34,7 @@ def get_data(n_rows=None):
 #   "All estimators in the main scikit-learn codebase should inherit from sklearn.base.BaseEstimator."
 class naiveBayes(sklearn.base.BaseEstimator):
     def __init__(self, laplace_smoothing=1):
-        if laplace_smoothing is None:
-            laplace_smoothing = 1
+
         self.laplace_smoothing = laplace_smoothing
         self.tweet_num = {}  # stores the amount of tweets that are 'positive' or 'negative'
         self.log_prior_probability = {}  # stores the log prior probability of a message being 'positive' or 'negative'
@@ -128,7 +129,10 @@ class naiveBayes(sklearn.base.BaseEstimator):
 def main():
     args = parse_arguments()
 
-    X, y = get_data(n_rows=args.n_rows)
+    startTime = time.time()
+
+
+    X, y = read_data(n_rows=args.n_rows)
     # X, y = get_data(n_rows=10000)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
@@ -143,6 +147,8 @@ def main():
     # cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
     # for metric in list(metrics):
     #     print(metric, cv_results['test_'+str(metric)].mean())
+
+    print("Elapsed time: ", time.time() - startTime)
 
 
 def parse_arguments():
