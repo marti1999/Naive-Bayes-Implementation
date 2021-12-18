@@ -1,5 +1,6 @@
 import re
 import math
+import sys
 import time
 
 from sklearn.model_selection import train_test_split, KFold, cross_validate
@@ -36,13 +37,28 @@ def read_data(n_rows=None):
 # Needed in order to use some sklearn modules like cross_validate
 #   "All estimators in the main scikit-learn codebase should inherit from sklearn.base.BaseEstimator."
 class naiveBayes(sklearn.base.BaseEstimator):
-    def __init__(self, laplace_smoothing=1):
+    def __init__(self, laplace_smoothing=1, dictionary_size=sys.maxsize):
 
         self.laplace_smoothing = laplace_smoothing
         self.tweet_num = {}  # stores the amount of tweets that are 'positive' or 'negative'
         self.log_prior_probability = {}  # stores the log prior probability of a message being 'positive' or 'negative'
         self.wc = {}  # for each class, stores the amount of times a word appears
         self.dictionary = set()  # set of unique words.
+    #     TODO canviar set per list i fer el :dictionary_size
+        self.dictionary_size = dictionary_size
+
+
+    # function used to test different dictionary sizes.
+    # as it is not used inside the class, it is static
+    @staticmethod
+    def count_total_words(X):
+        words = set()
+        xArr = X.values
+        for x in xArr:
+            counts = Counter(str(x).split())
+            for word in counts.keys():
+                words.add(word)
+        return len(words)
 
 
     # @profile
@@ -82,6 +98,8 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
                 # creating new items should they not exist
                 # if word not in self.dictionary:
+                if len(self.dictionary) >= self.dictionary_size:
+                    break
                 self.dictionary.add(word)
                 if word not in self.wc[c]:
                     self.wc[c][word] = 0.0
@@ -104,6 +122,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 if word not in self.dictionary:
                     continue
 
+                # TODO canviar el .get per un []
                 # Applying Naive Bayes
                 # We need to calculate p(w_i | positive) and p(w_i | negative)
                 # The numerator is how many times w_i appears in a tweet of such class, divided by the count of
@@ -138,11 +157,12 @@ def main():
 
 
     # X, y = read_data(n_rows=args.n_rows)
-    X, y = read_data(n_rows=100000)
+    X, y = read_data(n_rows=10000)
 
     # test(X, args, y)
 
-    test_size_comparison(X, args, y)
+    # test_size_comparison(X, args, y)
+    dictionary_length_comparison(X, args, y)
 
     # kfold(X, args, y)
 
@@ -153,13 +173,25 @@ def test_size_comparison(X, args, y):
     test_sizes = [0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 0.98]
     results = []
     for i in test_sizes:
-        results.append(test(X, args, y, i))
+        results.append(test(X, args, y, test_size=i))
     show_bar_plot(results, test_sizes, 'Accuracy', 'Test Size Comparison')
 
+def dictionary_length_comparison(X, args, y, partitions=10):
+    sizes = []
+    sizesLabel = []
+    maxSize = naiveBayes.count_total_words(X)
+    for i in range(1, partitions+1):
+        sizes.append(int(i*maxSize / partitions))
+        sizesLabel.append(str(i*10)+'%')
+    results = []
+    for s in sizes:
+        results.append(test(X, args, y, dictionary_size=s))
+    show_bar_plot(results, sizesLabel, 'Accuracy', 'dictionary Size Comparison')
 
-def test(X, args, y, test_size=0.2):
+
+def test(X, args, y, test_size=0.2, dictionary_size=sys.maxsize):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
-    nb = naiveBayes(laplace_smoothing=args.smooth)
+    nb = naiveBayes(laplace_smoothing=args.smooth, dictionary_size=dictionary_size)
     nb.fit(X_train, y_train)
     y_pred = nb.predict(X_test)
     # conf_matrix(y_test, y_pred)
@@ -210,6 +242,7 @@ def parse_arguments():
     parser.add_argument('--smooth', type=float, default=1, help='Value for Laplace Smoothing')
     parser.add_argument('--n_rows', type=int, default=None, help='Amount of rows to read from csv file')
     parser.add_argument('--n_splits', type=int, default=5, help='K_Fold splits')
+    # TODO add arguments test size i dictionary size
     args = parser.parse_args()
     if args.smooth is not None and args.smooth < 0:
         parser.error("smooth argument cannot be less than 0")
