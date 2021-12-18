@@ -9,7 +9,8 @@ import pandas
 import sklearn
 import argparse
 from collections import Counter
-# from line_profiler_pycharm import profile
+from multiprocessing import Pool
+
 
 
 
@@ -126,6 +127,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
         return result
 
+
 # @profile
 def main():
     args = parse_arguments()
@@ -133,8 +135,8 @@ def main():
     startTime = time.time()
 
 
-    # X, y = read_data(n_rows=args.n_rows)
-    X, y = read_data(n_rows=10000)
+    X, y = read_data(n_rows=args.n_rows)
+    # X, y = read_data(n_rows=10000)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     nb = naiveBayes(laplace_smoothing=args.smooth)
