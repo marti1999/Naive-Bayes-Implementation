@@ -140,14 +140,34 @@ def main():
     X, y = read_data(n_rows=args.n_rows)
     # X, y = read_data(n_rows=10000)
 
+    # test(X, args, y)
+
+    test_size_comparison(X, args, y)
+
+    # kfold(X, args, y)
+
+    print("Elapsed time: ", time.time() - startTime)
+
+
+def test_size_comparison(X, args, y):
+    test_sizes = [0.1, 0.2, 0.4, 0.6, 0.8]
+    results = []
+    for i in test_sizes:
+        results.append(test(X, args, y, i))
+    show_bar_plot(results, test_sizes, 'Accuracy', 'Test Size Comparison')
+
+
+def test(X, args, y, test_size=0.2):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     nb = naiveBayes(laplace_smoothing=args.smooth)
     nb.fit(X_train, y_train)
     y_pred = nb.predict(X_test)
-    conf_matrix(y_test, y_pred)
-    # print(accuracy_score(y_test, y_pred))
+    # conf_matrix(y_test, y_pred)
+    print(accuracy_score(y_test, y_pred))
+    return accuracy_score(y_test, y_pred)
 
 
+def kfold(X, args, y):
     kf = KFold(n_splits=args.n_splits, random_state=None, shuffle=True)
     NB = naiveBayes(laplace_smoothing=args.smooth)
     # metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
@@ -156,8 +176,6 @@ def main():
     # for metric in list(metrics):
     print('accuracy average: ', cv_results['test_'+str('score')].mean())
     print('accuracy standard deviation: ', np.std(cv_results['test_'+str('score')]))
-
-    print("Elapsed time: ", time.time() - startTime)
 
 
 def conf_matrix(true, pred):
@@ -174,6 +192,17 @@ def conf_matrix(true, pred):
     ax.yaxis.set_ticklabels(['0', '1'])
 
     ## Display the visualization of the Confusion Matrix.
+    plt.show()
+
+def show_bar_plot(values, labels, ylabel='', title=''):
+    xlabels = labels
+    yvalues = values
+    x_pos = [i for i, _ in enumerate(xlabels)]
+    plt.bar(x_pos, yvalues)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.xticks(x_pos, xlabels)
+    plt.ylim([0, 1])
     plt.show()
 
 def parse_arguments():
