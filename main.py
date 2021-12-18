@@ -41,6 +41,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
         self.wc = {}  # for each class, stores the amount of times a word appears
         self.dictionary = set()  # set of unique words.
 
+
     # @profile
     def fit(self, X, y):
 
@@ -77,8 +78,8 @@ class naiveBayes(sklearn.base.BaseEstimator):
             for word, count in counts.items():
 
                 # creating new items should they not exist
-                if word not in self.dictionary:
-                    self.dictionary.add(word)
+                # if word not in self.dictionary:
+                self.dictionary.add(word)
                 if word not in self.wc[c]:
                     self.wc[c][word] = 0.0
 
@@ -132,8 +133,8 @@ def main():
     startTime = time.time()
 
 
-    X, y = read_data(n_rows=args.n_rows)
-    # X, y = get_data(n_rows=10000)
+    # X, y = read_data(n_rows=args.n_rows)
+    X, y = read_data(n_rows=10000)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     nb = naiveBayes(laplace_smoothing=args.smooth)
