@@ -3,14 +3,16 @@ import math
 import time
 
 from sklearn.model_selection import train_test_split, KFold, cross_validate
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 import numpy as np
 import pandas
 import sklearn
 import argparse
 from collections import Counter
 from multiprocessing import Pool
-
+import matplotlib.pyplot as plt
+from sklearn.metrics import plot_confusion_matrix
+import seaborn as sns
 
 
 
@@ -142,17 +144,37 @@ def main():
     nb = naiveBayes(laplace_smoothing=args.smooth)
     nb.fit(X_train, y_train)
     y_pred = nb.predict(X_test)
-    print(classification_report(y_test, y_pred))
+    conf_matrix(y_test, y_pred)
+    # print(accuracy_score(y_test, y_pred))
 
-    # kf = KFold(n_splits=args.n_splits, random_state=None, shuffle=True)
-    # NB = naiveBayes(laplace_smoothing=args.smooth)
+
+    kf = KFold(n_splits=args.n_splits, random_state=None, shuffle=True)
+    NB = naiveBayes(laplace_smoothing=args.smooth)
     # metrics = ('accuracy', 'precision', 'recall', 'f1_micro')
-    # cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
+    metrics = ('accuracy')
+    cv_results = cross_validate(NB, X, y, cv=kf, scoring=metrics)
     # for metric in list(metrics):
-    #     print(metric, cv_results['test_'+str(metric)].mean())
+    print('accuracy average: ', cv_results['test_'+str('score')].mean())
+    print('accuracy standard deviation: ', np.std(cv_results['test_'+str('score')]))
 
     print("Elapsed time: ", time.time() - startTime)
 
+
+def conf_matrix(true, pred):
+    cf_matrix = confusion_matrix(true, pred, normalize='true')
+    ax = sns.heatmap(cf_matrix / np.sum(cf_matrix), annot=True,
+                     fmt='.2%', cmap='Blues')
+
+    ax.set_title('Confusion Matrix\n\n')
+    ax.set_xlabel('\nPredicted Values')
+    ax.set_ylabel('Actual Values ')
+
+    ## Ticket labels - List must be in alphabetical order
+    ax.xaxis.set_ticklabels(['0', '1'])
+    ax.yaxis.set_ticklabels(['0', '1'])
+
+    ## Display the visualization of the Confusion Matrix.
+    plt.show()
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
