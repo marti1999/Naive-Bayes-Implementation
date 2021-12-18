@@ -137,8 +137,8 @@ def main():
     startTime = time.time()
 
 
-    X, y = read_data(n_rows=args.n_rows)
-    # X, y = read_data(n_rows=10000)
+    # X, y = read_data(n_rows=args.n_rows)
+    X, y = read_data(n_rows=100000)
 
     # test(X, args, y)
 
@@ -150,7 +150,7 @@ def main():
 
 
 def test_size_comparison(X, args, y):
-    test_sizes = [0.1, 0.2, 0.4, 0.6, 0.8]
+    test_sizes = [0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 0.98]
     results = []
     for i in test_sizes:
         results.append(test(X, args, y, i))
@@ -158,7 +158,7 @@ def test_size_comparison(X, args, y):
 
 
 def test(X, args, y, test_size=0.2):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
     nb = naiveBayes(laplace_smoothing=args.smooth)
     nb.fit(X_train, y_train)
     y_pred = nb.predict(X_test)
@@ -202,7 +202,7 @@ def show_bar_plot(values, labels, ylabel='', title=''):
     plt.ylabel(ylabel)
     plt.title(title)
     plt.xticks(x_pos, xlabels)
-    plt.ylim([0, 1])
+    plt.ylim([0.5, 0.8])
     plt.show()
 
 def parse_arguments():
