@@ -37,8 +37,15 @@ class naiveBayes(sklearn.base.BaseEstimator):
     def fit(self, X, y):
 
         # dataframe to npArray
-        xArr = X.values
-        yArr = y.values
+        # inside try catch, otherwise it crashes when th
+        try:
+            xArr = X.values
+        except:
+            xArr = X
+        try:
+            yArr = y.values
+        except:
+            yArr = y
 
         # total amount of tweets
         n = X.shape[0]
@@ -80,7 +87,10 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
     # @profile
     def predict(self, X):
-        xArr = X.values
+        try:
+            xArr = X.values
+        except:
+            xArr = X
         result = []
         dictionary_length = len(self.dictionary)
         tweet_num_positive = self.tweet_num['positive']

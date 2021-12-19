@@ -1,6 +1,7 @@
 import sys
 
 import numpy as np
+from sklearn.ensemble import BaggingClassifier, AdaBoostClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, KFold, cross_validate
 
@@ -31,6 +32,12 @@ def laplace_smoothing_comparison(X, args, y):
         print("Laplace Smoothing: ", v, end=" --> accuracy = ")
         results.append(test(X, args, y))
     show_bar_plot(results, valuesLabels, 'Accuracy', 'Laplace Smoothing Comparison', 'alpha')
+
+def test_bagging(X, args, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    clf = BaggingClassifier(base_estimator=naiveBayes(), n_estimators=9, n_jobs=-1, random_state=0).fit(X_train.values.reshape(-1,1), y_train)
+    y_pred = clf.predict(X_test.values.reshape(-1,1))
+    print(accuracy_score(y_test, y_pred))
 
 def dictionary_length_comparison(X, args, y, partitions=10):
     sizes = []

@@ -28,8 +28,8 @@ def main():
 
     startTime = time.time()
 
-    X, y = read_data(n_rows=args.n_rows)
-    # X, y = read_data(n_rows=100000)
+    # X, y = read_data(n_rows=args.n_rows)
+    X, y = read_data(n_rows=100000)
 
     print("\nSINGLE EXECUTION \nAccuracy = ", end="")
     test(X, args, y)
@@ -43,6 +43,10 @@ def main():
 
     print("\n\nKFOLD CROSS VALIDATION")
     kfold(X, args, y)
+
+    # print("\n\nBAGGING CLASSIFIER")
+    # test_bagging(X, args, y)
+
 
     print("Elapsed time: ", time.time() - startTime)
 
