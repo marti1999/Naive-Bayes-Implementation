@@ -14,12 +14,10 @@ class naiveBayes(sklearn.base.BaseEstimator):
     def __init__(self, laplace_smoothing=1, dictionary_size=sys.maxsize):
 
         self.laplace_smoothing = laplace_smoothing
-        self.tweet_num = {}  # stores the amount of tweets that are 'positive' or 'negative'
         self.log_prior_probability = {}  # stores the log prior probability of a message being 'positive' or 'negative'
         self.wc = {}  # for each class, stores the amount of times a word appears
         self.dictionary = set()  # set of unique words.
-        #     TODO canviar set per list i fer el :dictionary_size
-        self.dictionary_size = dictionary_size
+        self.dictionary_size = dictionary_size # maximum dictionary size
 
     # function used to test different dictionary sizes.
     # as it is not used inside the class, it is static
@@ -37,7 +35,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
     def fit(self, X, y):
 
         # dataframe to npArray
-        # inside try catch, otherwise it crashes when th
+        # inside try catch, otherwise it crashes when using bagging
         try:
             xArr = X.values
         except:
@@ -51,12 +49,12 @@ class naiveBayes(sklearn.base.BaseEstimator):
         n = X.shape[0]
 
         # storing the amount of tweets that are 'positive' or 'negative'
-        self.tweet_num['positive'] = np.count_nonzero(yArr)
-        self.tweet_num['negative'] = n - self.tweet_num['positive']
+        self.tweets_positive = np.count_nonzero(yArr)
+        self.tweets_negative = n - self.tweets_positive
 
         # calculating the prior probability of a message being 'positive' or 'negative'
-        self.log_prior_probability['negative'] = math.log(self.tweet_num['negative'])
-        self.log_prior_probability['positive'] = math.log(self.tweet_num['positive'])
+        self.log_prior_probability['negative'] = math.log(self.tweets_negative)
+        self.log_prior_probability['positive'] = math.log(self.tweets_positive)
 
         self.wc['negative'] = {}
         self.wc['positive'] = {}
@@ -87,14 +85,17 @@ class naiveBayes(sklearn.base.BaseEstimator):
 
     # @profile
     def predict(self, X):
+        # dataframe to npArray
+        # inside try catch, otherwise it crashes when using bagging
         try:
             xArr = X.values
         except:
             xArr = X
+
         result = []
         dictionary_length = len(self.dictionary)
-        tweet_num_positive = self.tweet_num['positive']
-        tweet_num_negative = self.tweet_num['negative']
+        tweet_num_positive = self.tweets_positive
+        tweet_num_negative = self.tweets_negative
         log_prior_probability_positive = self.log_prior_probability['positive']
         log_prior_probability_negative = self.log_prior_probability['negative']
 
