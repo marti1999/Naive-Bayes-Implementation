@@ -156,13 +156,13 @@ def main():
     startTime = time.time()
 
 
-    # X, y = read_data(n_rows=args.n_rows)
-    X, y = read_data(n_rows=10000)
+    X, y = read_data(n_rows=args.n_rows)
+    # X, y = read_data(n_rows=100000)
 
-    # test(X, args, y)
+    test(X, args, y)
 
     # test_size_comparison(X, args, y)
-    dictionary_length_comparison(X, args, y)
+    # dictionary_length_comparison(X, args, y, partitions=20)
 
     # kfold(X, args, y)
 
@@ -180,13 +180,22 @@ def dictionary_length_comparison(X, args, y, partitions=10):
     sizes = []
     sizesLabel = []
     maxSize = naiveBayes.count_total_words(X)
-    for i in range(1, partitions+1):
-        sizes.append(int(i*maxSize / partitions))
-        sizesLabel.append(str(i*10)+'%')
+
+    mult = 100
+    for i in range(partitions):
+        sizes.append(maxSize)
+        sizesLabel.append(str("%.2f" % mult))
+        maxSize = int(maxSize/2)
+        mult = mult/2
+
+    # for i in range(1, partitions+1):
+    #     sizes.append(int(i*maxSize / partitions))
+    #     sizesLabel.append(str(i*10)+'%')
+
     results = []
     for s in sizes:
         results.append(test(X, args, y, dictionary_size=s))
-    show_bar_plot(results, sizesLabel, 'Accuracy', 'dictionary Size Comparison')
+    show_bar_plot(results, sizesLabel, 'Accuracy', 'dictionary Size Comparison', xlabel='Size percentatge')
 
 
 def test(X, args, y, test_size=0.2, dictionary_size=sys.maxsize):
@@ -226,12 +235,13 @@ def conf_matrix(true, pred):
     ## Display the visualization of the Confusion Matrix.
     plt.show()
 
-def show_bar_plot(values, labels, ylabel='', title=''):
+def show_bar_plot(values, labels, ylabel='', title='', xlabel=''):
     xlabels = labels
     yvalues = values
     x_pos = [i for i, _ in enumerate(xlabels)]
     plt.bar(x_pos, yvalues)
     plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
     plt.title(title)
     plt.xticks(x_pos, xlabels)
     plt.ylim([0.5, 0.8])
