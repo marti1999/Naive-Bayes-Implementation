@@ -27,16 +27,23 @@ def main():
     startTime = time.time()
 
 
-    # X, y = read_data(n_rows=args.n_rows)
-    X, y = read_data(n_rows=100000)
+    X, y = read_data(n_rows=args.n_rows)
+    # X, y = read_data(n_rows=100000)
 
-    # test(X, args, y)
+    print("\nSINGLE EXECUTION")
+    test(X, args, y)
 
+
+
+    print("\n\nTEST SIZE COMPARISON (7 EXECUTIONS")
+    test_size_comparison(X, args, y)
+    print("\n\nDICTIONARY LENGTH COMPARISON (10 EXECUTIONS)")
+    dictionary_length_comparison(X, args, y, partitions=10)
+    print("\n\nLAPLACE SMOOTHING COMPARISON (10 EXECUTIONS)")
     laplace_smoothing_comparison(X, args, y)
-    # test_size_comparison(X, args, y)
-    # dictionary_length_comparison(X, args, y, partitions=10)
 
-    # kfold(X, args, y)
+    print("\n\nKFOLD CROSS VALIDATION")
+    kfold(X, args, y)
 
     print("Elapsed time: ", time.time() - startTime)
 

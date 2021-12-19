@@ -19,16 +19,16 @@ def test_size_comparison(X, args, y):
 def laplace_smoothing_comparison(X, args, y):
     values = []
     valuesLabels = []
-    lap_smooth= 0.0001
+    lap_smooth= 0.01
     for i in range(10):
         values.append(lap_smooth)
-        valuesLabels.append(format(lap_smooth,'.0e'))
+        valuesLabels.append(np.format_float_scientific(lap_smooth, precision=0, exp_digits=1))
         lap_smooth*=10
     results = []
     for v in values:
         args.smooth = v
         results.append(test(X, args, y))
-    show_bar_plot(results, valuesLabels, 'Accuracy', 'Laplace Smoothing Comparison', 'Values')
+    show_bar_plot(results, valuesLabels, 'Accuracy', 'Laplace Smoothing Comparison', 'alpha')
 
 def dictionary_length_comparison(X, args, y, partitions=10):
     sizes = []
