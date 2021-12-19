@@ -83,6 +83,9 @@ class naiveBayes(sklearn.base.BaseEstimator):
     def predict(self, X):
         xArr = X.values
         result = []
+        dictionary_length = len(self.dictionary)
+        tweet_num_positive = self.tweet_num['positive']
+        tweet_num_negative = self.tweet_num['negative']
 
         for tweet in xArr:
 
@@ -94,19 +97,27 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 if word not in self.dictionary:
                     continue
 
-                # TODO canviar el .get per un []
 
                 # Applying Naive Bayes
                 # We need to calculate p(w_i | positive) and p(w_i | negative)
                 # The numerator is how many times w_i appears in a tweet of such class, divided by the count of
                 # all words in the tweets of the class.
-                # Since we can't calculate log of 0, we use Laplace Smoothing, adding 1 to the numerator.
-                # In order to balance it, the size of the dictionary must be added to the numerator
+                # Since we can't calculate log of 0, we use Laplace Smoothing, adding l to the numerator.
+                # In order to balance it, the size of the dictionary must be added to the denominator
                 # TODO quan no hi ha laplace smoothing, posar ambdos com a log(1)
-                log_positive = math.log((self.wc['positive'].get(word, 0.0) + self.laplace_smoothing)
-                                        / (self.tweet_num['positive'] + len(self.dictionary)))
-                log_negative = math.log((self.wc['negative'].get(word, 0.0) + self.laplace_smoothing)
-                                        / (self.tweet_num['negative'] + len(self.dictionary)))
+
+                # using get instead of [], we avoid error when the key does not exist and we can also set a default value
+                numerator_positive = self.wc['positive'].get(word, 0.0) + self.laplace_smoothing
+                numerator_negative = self.wc['negative'].get(word, 0.0) + self.laplace_smoothing
+
+                # should there be a 0, we don't take this word into consideration (only used when laplace smoothing == 0 as well)
+                if numerator_positive == 0 or numerator_negative == 0:
+                    continue
+
+                log_positive = math.log(numerator_positive
+                                        / (tweet_num_positive + dictionary_length))
+                log_negative = math.log(numerator_negative
+                                        / (tweet_num_negative + dictionary_length))
 
                 positive_count += log_positive
                 negative_count += log_negative
