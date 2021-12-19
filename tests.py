@@ -16,6 +16,20 @@ def test_size_comparison(X, args, y):
     show_bar_plot(results, test_sizes, 'Accuracy', 'Test Size Comparison')
 
 
+def laplace_smoothing_comparison(X, args, y):
+    values = []
+    valuesLabels = []
+    lap_smooth= 0.0001
+    for i in range(10):
+        values.append(lap_smooth)
+        valuesLabels.append(format(lap_smooth,'.0e'))
+        lap_smooth*=10
+    results = []
+    for v in values:
+        args.smooth = v
+        results.append(test(X, args, y))
+    show_bar_plot(results, valuesLabels, 'Accuracy', 'Laplace Smoothing Comparison', 'Values')
+
 def dictionary_length_comparison(X, args, y, partitions=10):
     sizes = []
     sizesLabel = []
@@ -27,10 +41,6 @@ def dictionary_length_comparison(X, args, y, partitions=10):
         sizesLabel.append(str("%.2f" % mult))
         maxSize = int(maxSize/2)
         mult = mult/2
-
-    # for i in range(1, partitions+1):
-    #     sizes.append(int(i*maxSize / partitions))
-    #     sizesLabel.append(str(i*10)+'%')
 
     results = []
     for s in sizes:

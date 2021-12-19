@@ -27,11 +27,12 @@ def main():
     startTime = time.time()
 
 
-    X, y = read_data(n_rows=args.n_rows)
-    # X, y = read_data(n_rows=100000)
+    # X, y = read_data(n_rows=args.n_rows)
+    X, y = read_data(n_rows=100000)
 
-    test(X, args, y)
+    # test(X, args, y)
 
+    laplace_smoothing_comparison(X, args, y)
     # test_size_comparison(X, args, y)
     # dictionary_length_comparison(X, args, y, partitions=10)
 
