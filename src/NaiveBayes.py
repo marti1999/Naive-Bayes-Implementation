@@ -73,7 +73,7 @@ class naiveBayes(sklearn.base.BaseEstimator):
                     break
                 self.dictionary.add(word)
                 if word not in self.wc[c]:
-                    self.wc[c][word] = 0.0
+                    self.wc[c][word] = 0
 
                 # increasing the count for word in class
                 self.wc[c][word] += count
@@ -106,8 +106,8 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 # In order to balance it, the size of the dictionary must be added to the denominator
 
                 # using get instead of [], we avoid error when the key does not exist and we can also set a default value
-                numerator_positive = self.wc['positive'].get(word, 0.0) + self.laplace_smoothing
-                numerator_negative = self.wc['negative'].get(word, 0.0) + self.laplace_smoothing
+                numerator_positive = self.wc['positive'].get(word, 0) + self.laplace_smoothing
+                numerator_negative = self.wc['negative'].get(word, 0) + self.laplace_smoothing
 
                 # should there be a 0, we don't take this word into consideration (only used when laplace smoothing == 0 as well)
                 if numerator_positive == 0 or numerator_negative == 0:
