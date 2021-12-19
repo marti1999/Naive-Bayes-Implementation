@@ -7,7 +7,6 @@ from tests import *
 
 
 def read_data(n_rows=None):
-    # data = pandas.read_csv('top10k.csv', sep=';')
     try:
         data = pandas.read_csv('./data/data.csv', sep=';')
     except:
@@ -20,8 +19,6 @@ def read_data(n_rows=None):
 
     X = data['tweetText']
     y = data['sentimentLabel']
-    # return X.values, y.values
-    # return X.tolist(), y.tolist()
     return X, y
 
 

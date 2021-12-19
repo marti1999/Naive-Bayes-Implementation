@@ -69,7 +69,6 @@ class naiveBayes(sklearn.base.BaseEstimator):
             for word, count in counts.items():
 
                 # creating new items should they not exist
-                # if word not in self.dictionary:
                 if len(self.dictionary) >= self.dictionary_size:
                     break
                 self.dictionary.add(word)
@@ -86,6 +85,8 @@ class naiveBayes(sklearn.base.BaseEstimator):
         dictionary_length = len(self.dictionary)
         tweet_num_positive = self.tweet_num['positive']
         tweet_num_negative = self.tweet_num['negative']
+        log_prior_probability_positive = self.log_prior_probability['positive']
+        log_prior_probability_negative = self.log_prior_probability['negative']
 
         for tweet in xArr:
 
@@ -97,14 +98,12 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 if word not in self.dictionary:
                     continue
 
-
                 # Applying Naive Bayes
                 # We need to calculate p(w_i | positive) and p(w_i | negative)
                 # The numerator is how many times w_i appears in a tweet of such class, divided by the count of
                 # all words in the tweets of the class.
                 # Since we can't calculate log of 0, we use Laplace Smoothing, adding l to the numerator.
                 # In order to balance it, the size of the dictionary must be added to the denominator
-                # TODO quan no hi ha laplace smoothing, posar ambdos com a log(1)
 
                 # using get instead of [], we avoid error when the key does not exist and we can also set a default value
                 numerator_positive = self.wc['positive'].get(word, 0.0) + self.laplace_smoothing
@@ -123,8 +122,8 @@ class naiveBayes(sklearn.base.BaseEstimator):
                 negative_count += log_negative
 
             # Adding prior probability of each class
-            positive_count += self.log_prior_probability['positive']
-            negative_count += self.log_prior_probability['negative']
+            positive_count += log_prior_probability_positive
+            negative_count += log_prior_probability_negative
 
             if positive_count > negative_count:
                 result.append(1)
