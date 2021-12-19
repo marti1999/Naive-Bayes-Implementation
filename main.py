@@ -1,3 +1,4 @@
+import copy
 import time
 
 import pandas
@@ -30,17 +31,17 @@ def main():
     X, y = read_data(n_rows=args.n_rows)
     # X, y = read_data(n_rows=100000)
 
-    print("\nSINGLE EXECUTION")
+    print("\nSINGLE EXECUTION \nAccuracy = ", end ="")
     test(X, args, y)
 
 
 
-    print("\n\nTEST SIZE COMPARISON (7 EXECUTIONS")
-    test_size_comparison(X, args, y)
-    print("\n\nDICTIONARY LENGTH COMPARISON (10 EXECUTIONS)")
-    dictionary_length_comparison(X, args, y, partitions=10)
-    print("\n\nLAPLACE SMOOTHING COMPARISON (10 EXECUTIONS)")
-    laplace_smoothing_comparison(X, args, y)
+    print("\n\nTEST SIZE COMPARISON")
+    test_size_comparison(X, copy.deepcopy(args), y)
+    print("\n\nDICTIONARY LENGTH COMPARISON")
+    dictionary_length_comparison(X, copy.deepcopy(args), y, partitions=10)
+    print("\n\nLAPLACE SMOOTHING COMPARISON")
+    laplace_smoothing_comparison(X, copy.deepcopy(args), y)
 
     print("\n\nKFOLD CROSS VALIDATION")
     kfold(X, args, y)

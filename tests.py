@@ -12,6 +12,7 @@ def test_size_comparison(X, args, y):
     test_sizes = [0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 0.98]
     results = []
     for i in test_sizes:
+        print("test size: ", i, end=" --> accuracy = ")
         results.append(test(X, args, y, test_size=i))
     show_bar_plot(results, test_sizes, 'Accuracy', 'Test Size Comparison')
 
@@ -27,6 +28,7 @@ def laplace_smoothing_comparison(X, args, y):
     results = []
     for v in values:
         args.smooth = v
+        print("Laplace Smoothing: ", v, end=" --> accuracy = ")
         results.append(test(X, args, y))
     show_bar_plot(results, valuesLabels, 'Accuracy', 'Laplace Smoothing Comparison', 'alpha')
 
@@ -43,7 +45,8 @@ def dictionary_length_comparison(X, args, y, partitions=10):
         mult = mult/2
 
     results = []
-    for s in sizes:
+    for s, t in zip(sizes, sizesLabel):
+        print("dictionary Length %: ", t, end=" --> accuracy = ")
         results.append(test(X, args, y, dictionary_size=s))
     show_bar_plot(results, sizesLabel, 'Accuracy', 'dictionary Size Comparison', xlabel='Size percentatge')
 
