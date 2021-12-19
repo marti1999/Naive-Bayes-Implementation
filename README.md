@@ -5,17 +5,17 @@ python3 -m pip install -r requirements.txt
 
 Run program
 ```bash
-python3 main.py
+python3 ./src/main.py
 ```
 
 Run program with optional parameters
 ```bash
-python3 main.py --smooth 0.1 --n_rows 10000 --n_splits 4
+python3 ./src/main.py --smooth 0.1 --n_rows 10000 --n_splits 4
 ```
 
 Parameters information
 ```bash
-python3 main.py -h
+python3 ./src/main.py -h
 
 usage: main.py [-h] [--smooth SMOOTH] [--n_rows N_ROWS] [--n_splits N_SPLITS]
 optional arguments:
