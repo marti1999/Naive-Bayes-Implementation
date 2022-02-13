@@ -1,0 +1,56 @@
+\chapter{Disseny i implementació}
+Per poder implementar l’algorisme es fa ús d’un seguit de variables, a continuació es mostren les principals:
+
+\begin{itemize}
+\item wc (diccionari): Per cada classe, emmagatzema el número de vegades que una paraula apareix. Es tracta, doncs, de diccionaris anidats. A continuació es mostra un exemple del format.\\
+\begin{lstlisting}
+wc = {'positive': { 'hello' : 4,
+                    'car' : 7,
+                    'pencil' : 5
+                  },
+      'negative': { 'window': 2,
+                    'paper' : 10
+                  }
+     }
+
+\end{lstlisting}
+\item dictionary (set): emmagatzema cada paraula que es troba durant l’entrenament. Al tractar-se d’un set, ens assegurem que totes les paraules són úniques i no es repeteixen.
+\item log\textunderscore prior\textunderscore probability (diccionari): Guarda la probabilitat a priori que un tweet sigui positiu o negatiu.
+\item laplace\textunderscore smoothing (float): Conté el valor del Laplace Smoothing que s’utilitza durant la fase de predicció. 
+\end{itemize}
+
+Tot i que moltes variables podrien ser simples llistes, el fet d’utilitzar diccionaris va bé per poder accedir directament al valor que es necessita.\\\\
+L’algorisme està implementat dins d’una classe anomenada \textit{NaiveBayes}. Les principals funcions que conté són \textit{Fit} i \textit{Predict}.  La classe hereda de \textit{BaseEstimator} per tal de poder utilitzar el \textit{cross\textunderscore validate} de \textit{SkLearn}.
+
+\section{funció \textit{Fit}}
+És la funció utilitzada durant l’entrenament del model. Primer omple les variables “tweet\textunderscore num” i “log\textunderscore prior\textunderscore probability”.\\\\
+Seguidament fa els següents passos per cada tweet:
+
+\begin{enumerate}
+    \item Separar tweet per paraules.
+    \item Mirar la classe a la que pertany el tweet.
+    \item Per cada paraula:
+        \begin{enumerate}[label=\alph*.]
+        \item Afegir-la al set “dictionary”.
+        \item Incrementar el nombre d’aparicions per classe al diccionari “wc”.
+        \end{enumerate}
+\end{enumerate}
+
+\section{Funció \textit{Predict}}
+És la funció utilitzada durant les prediccions de les mostres. Per cada mostra fa els següents passos:
+
+\begin{enumerate}
+\item Separar tweet per paraules.
+\item Posar variables positive\textunderscore count i negative\textunderscore count a 0.
+\item Per cada paraula:
+
+        \begin{enumerate}[label=\alph*.]
+        \item Si no apareix al diccionari, continuar a la següent.
+        \item Calcular p(wi | ‘positive’) i p(wi | ‘negative’).
+        \item Sumar aquests valors a positive\textunderscore count i negative\textunderscore count
+
+        \end{enumerate}
+\item Afegir la probabilitat apriori de cada classe a positive\textunderscore count i negative\textunderscore count 
+\item Guardar com a resultat el la classe amb el valor més gran entre positive\textunderscore count i negative\textunderscore count
+
+\end{enumerate}

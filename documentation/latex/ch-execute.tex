@@ -1,0 +1,26 @@
+\chapter{Execució}
+El programa es pot executar amb Python des d’una línia de comandes. Abans, però, caldrà instal·lar totes les dependències necessàries:
+\begin{lstlisting}[language=bash]
+  $ python3 -m pip install -r requirements.txt
+\end{lstlisting}\leavevmode\newline
+Seguidament es pot executar el programa:
+\begin{lstlisting}[language=bash]
+  $ python3 ./src/main.py
+\end{lstlisting}\leavevmode\newline
+Addicionalment, també es pot executar amb arguments. La següent línia mostra com executar només amb 50000 mostres aleatòries per tal de tenir una execució més ràpida:
+\begin{lstlisting}[language=bash]
+  $ python3 ./src/main.py --n_rows 50000
+\end{lstlisting}\leavevmode\newline
+Es pot trobar una descripció de cada argument:
+\begin{lstlisting}[language=bash]
+  $ python3 ./src/main.py -h 
+
+
+usage: main.py [-h] [--smooth SMOOTH] [--n_rows N_ROWS] [--n_splits N_SPLITS]
+optional arguments:
+-h, --help           show this help message and exit
+--smooth SMOOTH      Value for Laplace Smoothing
+--n_rows N_ROWS      Amount of rows to read from csv file
+--n_splits N_SPLITS  K_Fold splits
+
+\end{lstlisting}

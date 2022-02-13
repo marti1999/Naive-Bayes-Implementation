@@ -1,0 +1,33 @@
+\documentclass[a4paper,twoside]{report}
+\usepackage[utf8]{inputenc}
+
+\title{Naïve Bayes\\Universitat Autònoma de Barcelona}
+\author{Martí Caixal}
+\date{February 2022}
+
+\include{packages}
+
+\include{config}
+
+\begin{document}
+\cleardoublepage
+
+\maketitle  \cleardoublepage
+
+\tableofcontents \cleardoublepage
+\listoffigures \cleardoublepage
+
+
+\include{ch-introduction} \cleardoublepage
+\include{ch-data} \cleardoublepage
+\include{ch-design} \cleardoublepage
+\include{ch-execute} \cleardoublepage
+\include{ch-metrics} \cleardoublepage
+\include{ch-sizes} \cleardoublepage
+\include{ch-laplaceSmoothing} \cleardoublepage
+\include{ch-conclusion}
+
+\bibliographystyle{plain}
+\bibliography{ref}
+
+\end{document}
