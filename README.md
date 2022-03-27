@@ -1,6 +1,6 @@
 This program is a Naive Bayes Classifier implementation using python (along with Numpy and Math libraries). Its goal is to tell whether a tweet is positive or negative. 
 The Naive-Bayes class inherits from sklearn BaseEstimator and so it can be used with multiple sklearn modules like cross_validate.  
-It is created with the aim to resemble models from machine learning libraries. Therefore, it can be used as one would expect by first creating the model, followd by calling fit and predict.  
+It is created with the aim to resemble models from machine learning libraries. Therefore, it can be used as one would expect by first creating the model, followed by calling fit and predict functions.    
 
 
 
