@@ -20,7 +20,7 @@ python3 ./src/main.py --smooth 0.1 --n_rows 10000 --n_splits 4
 ```
 
 Parameters information
-```bash
+```
 python3 ./src/main.py -h
 
 usage: main.py [-h] [--smooth SMOOTH] [--n_rows N_ROWS] [--n_splits N_SPLITS]
